@@ -32,7 +32,7 @@ Balanced search tree로 많이 쓰이는 Red-black tree (이하 RB tree)를 C �
 
 ## 과제의 의도 (Motivation)
 
-- 복잡한 자료구조(data structure)를 구현해 봄으로써 자신감 상승
+- 복잡한 자료구조(data structure)를 구현해 봄으로써 자신감 추락
 - C 언어, 특히 포인터(pointer)와 malloc, free 등의 system call에 익숙해짐.
 - 동적 메모리 할당(dynamic memory allocation)을 직접 사용해 봄으로써 동적 메모리 할당의 필요성 체감 및 data segment에 대한 이해도 상승
 - 고급 언어에서 기본으로 제공되는 자료구조가 세부적으로는 어떻게 구현되어 있는지 경험함으로써 고급 언어 사용시에도 효율성 고려

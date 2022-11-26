@@ -5,6 +5,8 @@
 rbtree *new_rbtree(void) {
   rbtree *p = (rbtree *)calloc(1, sizeof(rbtree));
   // TODO: initialize struct if needed
+
+  int a;
   return p;
 }
 
