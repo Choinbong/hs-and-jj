@@ -7,7 +7,7 @@ rbtree *new_rbtree(void) {
   // TODO: initialize struct if needed
   node_t *nilNode = (node_t*)calloc(1, sizeof(node_t));
 
-  nilNode->color = RBTREE_BLACK; // 센티넬 노드의 색상 검정으로 대입
+  nilNode->color = RBTREE_BLACK; // 센티넬 노드 흑색으로 대입
   p->root = nilNode; // 루트노드 센티넬로 설정
   p->nil = nilNode; // 닐노드 센티넬로 설정
 
@@ -21,13 +21,13 @@ void left_rotate(rbtree* T, node_t* x) {
   y = x->right; // y노드는 x노드의 오른쪽 자식이라고 대입
   x->right = y->left; // y의 왼쪽 서브트리를 x의 오른쪽 서브트리로
 
-  if (y->left != T->nil){ // y의 왼쪽 서브트리가 nil이 아니라면
+  if(y->left != T->nil){ // y의 왼쪽 서브트리가 nil이 아니라면
     y->left->parent = x; // y의 왼쪽 서브트리의 부모를 x노드로
   }
 
   y->parent = x->parent; // x노드의 부모를 y노드의 부모로 변경
 
-  if (x->parent == T->nil){ // x노드가 트리의 루트일때
+  if(x->parent == T->nil){ // x노드가 트리의 루트일때
     T->root = y; // y노드를 트리의 루트로
   }else if(x == x->parent->left){ // x노드가 왼쪽이라면
     x->parent->left = y; // x노드의 부모의 왼쪽 자식을 y노드로
@@ -45,13 +45,13 @@ void right_rotate(rbtree* T, node_t* x) {
   y = x->left;
   x->left = y->right;
 
-  if (y->right != T->nil){
+  if(y->right != T->nil){
     y->right->parent = x;
   }
 
   y->parent = x->parent;
 
-  if (x->parent == T->nil){
+  if(x->parent == T->nil){
     T->root = y;
   }else if(x == x->parent->right){
     x->parent->right = y;
@@ -63,6 +63,57 @@ void right_rotate(rbtree* T, node_t* x) {
   x->parent = y;
 }
 
+void rbtree_insert_fixup(rbtree *T, node_t *z){
+  node_t *y;
+  
+  while(z->parent->color == RBTREE_RED){ // z노드의 부모가 적색인 경우
+    if(z->parent == z->parent->parent->left){ // z의 부모가 조부모의 왼쪽 서브 트리일 경우
+
+      y = z->parent->parent->right;
+      
+      if(y->color == RBTREE_RED){ // CASE 1: 노드 z의 삼촌 y가 적색인 경우
+        z->parent->color = RBTREE_BLACK;
+        y->color = RBTREE_BLACK;
+        z->parent->parent->color = RBTREE_RED;
+      }else{
+        if(z == z->parent->right){ // CASE 2: z의 삼촌 y가 흑색이며 z가 오른쪽 자식인 경우
+        z = z->parent;
+
+        left_rotate(T, z); // 좌회전 수행
+        }
+        // CASE 3: z의 삼촌 y가 흑색이며 z가 왼쪽 자식인 경우
+        z->parent->color = RBTREE_BLACK;
+        z->parent->parent = RBTREE_RED;
+
+        right_rotate(T, z); // 우회전 수행
+
+      }
+    }else{
+      
+      y = z->parent->parent->left;
+
+      if(y->color == RBTREE_RED){
+        z->parent->color = RBTREE_BLACK;
+        y->color = RBTREE_BLACK;
+        z->parent->parent->color = RBTREE_RED;
+      }else{
+        if(z == z->parent->left){
+        z = z->parent;
+
+        right_rotate(T, z);
+
+        }
+        
+        z->parent->color = RBTREE_BLACK;
+        z->parent->parent = RBTREE_RED;
+
+        left_rotate(T, z);
+      }
+
+    }
+  }
+}
+
 void delete_rbtree(rbtree *t) {
   // TODO: reclaim the tree nodes's memory
   free(t);
@@ -70,12 +121,55 @@ void delete_rbtree(rbtree *t) {
 
 node_t *rbtree_insert(rbtree *t, const key_t key) {
   // TODO: implement insert
-  return t->root;
+  node_t *z = (node_t*)calloc(1, sizeof(node_t));
+  z->key = key;
+
+  node_t *y = t->nil;
+  node_t *x = t->root;
+
+  while(x != t->nil){
+    y = x;
+    if(z->key < x->key){
+      x = x->left;
+    }else{
+      x = x->right;
+    }
+  }
+
+  z->parent = y;
+
+  if(y == t->nil){
+    t->root = z;
+  }else if(z->key < y->key){
+    y->left = z;
+  }else{
+    y->right = z;
+  }
+
+  z->left = t->nil;
+  z->right = t->nil;
+  z->color = RBTREE_RED;
+
+  rbtree_insert_fixup(t, z);
+
+  return z;
 }
 
 node_t *rbtree_find(const rbtree *t, const key_t key) {
   // TODO: implement find
-  return t->root;
+  node_t *node = t->root;
+  while(node != t->nil){
+    if(node->key == key){
+      return node;
+    }
+
+    if(node->key < key){
+      node = node->right;
+    }else{
+      node = node->left;
+    }
+  }
+  return NULL;
 }
 
 node_t *rbtree_min(const rbtree *t) {
