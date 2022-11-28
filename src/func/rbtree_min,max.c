@@ -1,4 +1,4 @@
-#include "rbtree.h"
+#include "../rbtree.h"
 #include <stdlib.h>
 
 node_t *rbtree_min(const rbtree *t)

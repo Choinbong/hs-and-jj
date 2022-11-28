@@ -1,4 +1,4 @@
-#include "rbtree.h"
+#include "../rbtree.h"
 #include <stdlib.h>
 
 void left_rotation(rbtree *t, node_t *main) //왼쪽 회전시킬 루트노드 선언
@@ -13,9 +13,9 @@ void left_rotation(rbtree *t, node_t *main) //왼쪽 회전시킬 루트노드 �
     if (main->parent == t->nil)          // main 노드의 부모 노드가 트리의 nil 노드(main이 루트노드)면
         t->root = sub;                   //트리의 루트노드는 sub 노드로 변경
     else if (main == main->parent->left) // main 노드의 부모의 왼쪽 자식노드면
-        main->parent->left = sub;        // main 노드의 부모으 왼쪽 자식노드를 sub 노드로 변경
+        main->parent->left = sub;        // main 노드의 부모의 왼쪽 자식노드를 sub 노드로 변경
     else                                 // main 노드의 부모의 오른쪽 자식노드면
-        main->parent->right = sub;       // main 노드의 부모으 오른쪽 자식노드를 sub 노드로 변경
+        main->parent->right = sub;       // main 노드의 부모의 오른쪽 자식노드를 sub 노드로 변경
 
     sub->left = main;   // sub 노드의 왼쪽 자식 노드를 main 노드로 변경
     main->parent = sub; // main 노드의 부모 노드를 sub 노드로 변경

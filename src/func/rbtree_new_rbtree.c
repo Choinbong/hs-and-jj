@@ -1,4 +1,4 @@
-#include "rbtree.h"
+#include "../rbtree.h"
 #include <stdlib.h>
 
 rbtree *new_rbtree(void)
@@ -9,6 +9,5 @@ rbtree *new_rbtree(void)
     T_nil->color = 1;
     p->nil = T_nil;
     p->root = p->nil;
-    // TODO: initialize struct if needed
     return p;
 }

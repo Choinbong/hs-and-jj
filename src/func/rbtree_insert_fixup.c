@@ -1,4 +1,4 @@
-#include "rbtree.h"
+#include "../rbtree.h"
 #include <stdlib.h>
 
 void insert_fixup(rbtree *t, node_t *input)
