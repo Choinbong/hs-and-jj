@@ -15,7 +15,7 @@ rbtree *new_rbtree(void) {
   return p;
 }
 
-void left_rotate(rbtree* T, node_t* x) {
+void left_rotate(rbtree* T, node_t* x) { // 좌회전(역시계방향)
   // TODO
   node_t *y; // 노드형식 y포인터 선언
   if(x->right == T->nil){
@@ -42,7 +42,7 @@ void left_rotate(rbtree* T, node_t* x) {
   x->parent = y; // x노드의 부모를 y노드로
 }
 
-void right_rotate(rbtree* T, node_t* x) {
+void right_rotate(rbtree* T, node_t* x) { // 우회전(시계방향)
   // TODO
   node_t *y;
   if(x->left == T->nil){
@@ -77,14 +77,16 @@ void rbtree_insert_fixup(rbtree *T, node_t *z){
     if(z->parent == z->parent->parent->left){ // z의 부모가 조부모의 왼쪽 서브 트리일 경우
 
       y = z->parent->parent->right;
-      
-      if(y->color == RBTREE_RED){ // CASE 1: 노드 z의 삼촌 y가 적색인 경우
+
+      // CASE 1: 노드 z의 삼촌 y가 적색인 경우
+      if(y->color == RBTREE_RED){
         z->parent->color = RBTREE_BLACK;
         y->color = RBTREE_BLACK;
         z->parent->parent->color = RBTREE_RED;
         z = z->parent->parent;
       }else{
-        if(z == z->parent->right){ // CASE 2: z의 삼촌 y가 흑색이며 z가 오른쪽 자식인 경우
+        // CASE 2: z의 삼촌 y가 흑색이며 z가 오른쪽 자식인 경우
+        if(z == z->parent->right){
         z = z->parent;
 
         left_rotate(T, z); // 좌회전 수행
@@ -96,7 +98,7 @@ void rbtree_insert_fixup(rbtree *T, node_t *z){
         right_rotate(T, z->parent->parent); // 우회전 수행
 
       }
-    }else{
+    }else{ // 좌우 반전
       
       y = z->parent->parent->left;
 
@@ -124,7 +126,7 @@ void rbtree_insert_fixup(rbtree *T, node_t *z){
   T->root->color = RBTREE_BLACK;
 }
 
-void free_node(rbtree *t, node_t *x){
+void free_node(rbtree *t, node_t *x){ // 노드 메모리 반환
   // TODO
   // 후위 순회 방식으로 RB Tree 내의 노드 메모리 반환
   if(x->left != t->nil){ // x노드의 왼쪽 자식이 nilNode가 아니라면
@@ -137,7 +139,7 @@ void free_node(rbtree *t, node_t *x){
   x = NULL; // x값 NULL로 초기화
 }
 
-void delete_rbtree(rbtree *t) {
+void delete_rbtree(rbtree *t) { // 메모리 반환
   // TODO: reclaim the tree nodes's memory
   if(t->root != t->nil){ // 트리안에 노드가 있다면
     free_node(t, t->root); // 모든 노드 메모리를 반환하는 함수 수행
@@ -146,43 +148,43 @@ void delete_rbtree(rbtree *t) {
   free(t); // 트리 메모리 반환
 }
 
-node_t *rbtree_insert(rbtree *t, const key_t key) {
+node_t *rbtree_insert(rbtree *t, const key_t key) { // 노드 삽입
   // TODO: implement insert
   node_t *z = (node_t*)calloc(1, sizeof(node_t)); // 노드 메모리 할당
-  z->key = key; // 받은 키값을 노드에 저장
+  z->key = key; // 받은 키값을 노드 z에 저장
 
   node_t *y = t->nil; // y노드 포인터 nilnode가리킴
   node_t *x = t->root; // x노드 포인터 root가리킴
 
-  while(x != t->nil){
-    y = x;
-    if(z->key < x->key){
-      x = x->left;
+  while(x != t->nil){ // x노드가 nil을 가리킬 때까지
+    y = x; // x노드 y에 대입
+    if(z->key < x->key){ // 받은 키값이 비교하는 키값보다 작다면
+      x = x->left; // 트리 왼쪽으로
     }else{
-      x = x->right;
+      x = x->right; // 트리 오른쪽으로
     }
   }
 
-  z->parent = y;
+  z->parent = y; // 받은 키 값의 부모를 y로
 
-  if(y == t->nil){
-    t->root = z;
-  }else if(z->key < y->key){
-    y->left = z;
+  if(y == t->nil){ // y가 nilNode 라면 (트리가 비어 있다면)
+    t->root = z; // z를 트리의 root로
+  }else if(z->key < y->key){ // z의 값이 y의 값보다 작다면
+    y->left = z; // y의 왼쪽 자식을 z로
   }else{
-    y->right = z;
+    y->right = z; // y의 오른쪽 자식을 z로
   }
 
-  z->left = t->nil;
-  z->right = t->nil;
-  z->color = RBTREE_RED;
+  z->left = t->nil; // z노드의 자식을 nilNode로
+  z->right = t->nil; // z노드의 자식을 nilNode로
+  z->color = RBTREE_RED; // z노드의 color 적색으로
 
-  rbtree_insert_fixup(t, z);
+  rbtree_insert_fixup(t, z); // 속성 위반 수정
 
   return z;
 }
 
-node_t *rbtree_find(const rbtree *t, const key_t key) {
+node_t *rbtree_find(const rbtree *t, const key_t key) { // 노드 검색
   // TODO: implement find
   node_t *node = t->root; // node포인터로 root 가리킴
   while(node != t->nil){ // node가 nilNode가 아니라면
@@ -199,7 +201,7 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
   return NULL; // 찾지 못한다면 NULL 반환
 }
 
-node_t *rbtree_min(const rbtree *t) {
+node_t *rbtree_min(const rbtree *t) { // 최소값 노드
   // TODO: implement find
   if(t->root == t->nil){ // 루트가 nil을 가리키고 있다면(노드가 없다)
     return NULL; // NULL 반환
@@ -215,7 +217,7 @@ node_t *rbtree_min(const rbtree *t) {
   return x; // x노드 반환
 }
 
-node_t *rbtree_max(const rbtree *t) {
+node_t *rbtree_max(const rbtree *t) { // 최대값 노드
   // TODO: implement find
   if(t->root == t->nil){
     return NULL;
@@ -231,7 +233,7 @@ node_t *rbtree_max(const rbtree *t) {
   return x;
 }
 
-void rbtree_transplant(rbtree *t, node_t *u, node_t* v){
+void rbtree_transplant(rbtree *t, node_t *u, node_t* v){ // 
   // TODO
   if(u->parent == t->nil){
     t->root = v;
@@ -308,7 +310,7 @@ void rbtree_delete_fixup(rbtree *t, node_t *x){
   x->color = RBTREE_BLACK;
 }
 
-int rbtree_erase(rbtree *t, node_t *p) {
+int rbtree_erase(rbtree *t, node_t *p) { // 노드 하나 삭제
   // TODO: implement erase
   node_t *y;
   node_t *x;
@@ -356,7 +358,7 @@ int rbtree_erase(rbtree *t, node_t *p) {
   return 0;
 }
 
-void inorder(const rbtree *t, node_t *p, key_t *arr, const size_t n, int *index){
+void inorder(const rbtree *t, node_t *p, key_t *arr, const size_t n, int *index){ // 중위 순회
   // TODO
   if(p == t->nil){ // p가 nilNode에 도달한다면
     return; // 함수 종료
@@ -374,7 +376,7 @@ void inorder(const rbtree *t, node_t *p, key_t *arr, const size_t n, int *index)
 
 }
 
-int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
+int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) { // 트리의 노드 n개를 배열에 추가
   // TODO: implement to_array
   if(t->root == t->nil){ // 노드가 하나도 없다면
     return 0; // 0 반환
