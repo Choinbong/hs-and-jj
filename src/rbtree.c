@@ -233,22 +233,22 @@ node_t *rbtree_max(const rbtree *t) { // 최대값 노드
   return x;
 }
 
-void rbtree_transplant(rbtree *t, node_t *u, node_t* v){ // 
+void rbtree_transplant(rbtree *t, node_t *u, node_t* v){ // 삭제하는 노드자리에 자식 노드 이식하기
   // TODO
-  if(u->parent == t->nil){
-    t->root = v;
-  }else if(u == u->parent->left){
-    u->parent->left = v;
-  }else{
-    u->parent->right = v;
+  if(u->parent == t->nil){ // 삭제 노드가 루트노드 라면
+    t->root = v; // 삭제 노드의 자식을 루트로
+  }else if(u == u->parent->left){ // 삭제 노드가 부모의 왼쪽 자식이라면
+    u->parent->left = v; // 삭제 노드의 부모의 왼쪽을 삭제 노드의 자식 노드로
+  }else{ // 삭제노드가 부모의 오른쪽 자식이라면
+    u->parent->right = v; // 삭제 노드의 부모의 오른쪽을 삭제 노드의 자식 노드로
   }
-  v->parent = u->parent;
+  v->parent = u->parent; // 삭제 노드의 자식 노드 부모를 삭제노드의 부모로
 }
 
 void rbtree_delete_fixup(rbtree *t, node_t *x){
   node_t* w;
   while(x != t->root && x->color == RBTREE_BLACK){
-    if(x == x->parent->left){
+    if(x == x->parent->left){  
       w = x->parent->right;
       // 경우 1: x의 형제 w가 적색인 경우
       if(w->color == RBTREE_RED){
@@ -315,45 +315,51 @@ int rbtree_erase(rbtree *t, node_t *p) { // 노드 하나 삭제
   node_t *y;
   node_t *x;
   y = p;
-  color_t y_original_color = y->color;
+  color_t y_original_color = y->color; // 삭제 노드의 color 저장
 
+  // case 1: 왼쪽 노드가 nil일 때
   if(p->left == t->nil){
 
-    x = p->right;
-    rbtree_transplant(t, p, p->right);
+    x = p->right; // 노드x를 삭제노드 오른쪽 자식으로
+    rbtree_transplant(t, p, p->right); // 삭제 노드 자리에 오른쪽 자식 노드 이식
 
+  // case 2: 오른쪽 노드가 nil일 때
   }else if(p->right == t->nil){
 
-    x = p->left;
-    rbtree_transplant(t, p, p->left);
+    x = p->left; // 노드x를 삭제노드 왼쪽 자식으로
+    rbtree_transplant(t, p, p->left); // 삭제 노드 자리에 왼쪽 자식 노드 이식
 
+  // case 3: 왼쪽, 오른쪽 노드 모두 nil일 때
   }else{
 
-    y = p->right;
-    while(y->left != t->nil){
+    y = p->right; // y노드는 삭제노드의 오른쪽 자식
+    while(y->left != t->nil){ // y노드를 루트로한 서브트리의 successor 찾기
       y = y->left;
-    }
-    y_original_color = y->color;
-    x = y->right;
-    if(y->parent == p){
-      x->parent = y;
+    } // 이 시점부터 y는 succesor
+
+    y_original_color = y->color; // succesor의 색상으로 갱신
+    x = y->right; // x노드는 succesor의 오른쪽 자식
+
+    if(y->parent == p){ // succesor의 부모노드가 삭제노드라면
+      x->parent = y; // succesor의 오른쪽 자식의 부모는 succesor로
+
     }else{
-      rbtree_transplant(t, y, y->right);
-      y->right = p->right;
-      y->right->parent = y;
+      rbtree_transplant(t, y, y->right); // succesor자리에 succesor의 오른쪽 자식 노드 이식
+      y->right = p->right; // succesor의 오른쪽 자식을 삭제노드의 오른쪽 자식으로
+      y->right->parent = y; // succesor의 오른쪽 자식의 부모를 succesor로
     }
-    rbtree_transplant(t, p, y);
-    y->left = p->left;
-    y->left->parent = y;
-    y->color = p->color;
 
+    rbtree_transplant(t, p, y); // 삭제노드 자리에 succesor노드 이식
+    y->left = p->left; // succesor의 왼쪽 자식을 삭제노드의 왼쪽 자식으로
+    y->left->parent = y; // succesor의 왼쪽 자식의 부모를 succesor로
+    y->color = p->color; // succesor의 색을 삭제노드의 색으로 변경
   }
 
-  if(y_original_color == RBTREE_BLACK){
-    rbtree_delete_fixup(t, x);
+  if(y_original_color == RBTREE_BLACK){ // 만약 삭제색이 black이면
+    rbtree_delete_fixup(t, x); // 속성 위반 수정
   }
 
-  free(p);
+  free(p); // 삭제 노드 메모리 반환
 
   return 0;
 }
