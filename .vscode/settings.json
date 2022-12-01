@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "rbtree.h": "c",
+        "cstdlib": "c",
+        "cstdarg": "c",
+        "cstdio": "c",
+        "cstdbool": "c"
     }
 }
