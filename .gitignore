@@ -58,3 +58,6 @@ Mkfile.old
 dkms.conf
 
 .vscode
+
+remote
+~*/Makefile
